@@ -30,9 +30,17 @@ The variable size define the number of users that will be active (activeUsers)
 
 ## Methods
 
+## void addDepthRule(int minDepth, int maxDepth)
+
+To make only users active if they are inside the minDepth and maxDepth
+
 ### void scanUsers(int[] userMap)
 
 Will scan the pixels to find which users are on and which are off. The array userMap you can get from ```context.getUsersPixels(SimpleOpenNI.USERS_ALL)```
+
+### void scanUsers(int[] userMap, int[] depthMap)
+
+The depthMap is necessary to compare with minDepth and maxDepth
 
 ### void lostUser(int id)
 

@@ -19,6 +19,8 @@ import java.util.ArrayList;
 public class UserManager {
   private SimpleOpenNI context;
   private int time[]; // how much time each active user is off
+  private int minDepth;
+  private int maxDepth;
 
   // list of the id of the active users
   public int[][] activeUsers;
@@ -53,6 +55,12 @@ public class UserManager {
   public UserManager(SimpleOpenNI context, int size, int timer, int steps) {
     this.configure(context, size, timer);
     this.steps = steps;
+  }
+
+  // add rule to check only if the user is inside the depth
+  public void addDepthRule(int minDepth, int maxDepth){
+  	this.minDepth = minDepth;
+  	this.maxDepth = maxDepth;
   }
 
   // turn all users off
@@ -102,6 +110,49 @@ public class UserManager {
 
         if (cont) continue;
       }
+    }
+
+    checkActiveUsers();
+  }
+
+  // scan all the users to see who are on and who are off inside the predefined depth
+  public void scanUsers(int[] userMap, int[] depthMap) {
+    resetUsers(); // makes all users off so that the next code discover only the users that are on
+
+    for (int y = 0; y < context.depthHeight (); y += steps) {
+      for (int x = 0; x < context.depthWidth (); x += steps) {
+        boolean cont = false; // to not waste time looping unnecessary interactions
+
+        int index = x + y * context.depthWidth();
+
+        if ((minDepth <= 0 || depthMap[index] >= minDepth) && (maxDepth <= 0 || depthMap[index] <= maxDepth)){
+	        // active users
+	        for (int i = 0; i < activeUsers.length; i++) {
+	          // if the pixel belongs to an active user
+	          if (userMap[index] == activeUsers[i][0]) {
+	            activeUsers[i][1] = 1;
+
+	            cont = true;
+	            break;
+	          }
+	        }
+
+	        if (cont) continue;
+
+	        // waiting list users
+	        for (int i = 0; i < waitingList.size (); i++) {
+	          // if the pixel belongs to a user in the waiting list
+	          if (userMap[index] == waitingList.get(i)[0]) {
+	            waitingList.get(i)[1] = 1;
+
+	            cont = true;
+	            break;
+	          }
+	        }
+
+	        if (cont) continue;
+	    }
+	  }
     }
 
     checkActiveUsers();
