@@ -30,7 +30,7 @@ The variable size define the number of users that will be active (activeUsers)
 
 ## Methods
 
-## void addDepthRule(int minDepth, int maxDepth)
+### void addDepthRule(int minDepth, int maxDepth)
 
 To make only users active if they are inside the minDepth and maxDepth
 
